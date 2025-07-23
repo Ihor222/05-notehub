@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Pagination from "../../components/Pagination/Pagination"
 import SearchBox from "../../components/SearchBox/SearchBox"
-import css from "./App.module.css"
+import css from "./app.module.css"
 import { useDebouncedCallback } from "use-debounce"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import {fetchNotes} from "../../services/movieService"
