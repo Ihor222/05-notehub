@@ -1,26 +1,53 @@
-import {http} from "../libs/api-service.ts";
-import { ROUTES} from "../constants";
-import type {Movie} from "../types/movie.ts";
- interface MoviesResponse {
-    page: number;
-    results: Movie[];
-    total_pages: number;
-    total_results: number;
+import axios from 'axios';
+import type { Note, NoteTag } from '../types/movie';
+
+axios.defaults.baseURL = 'https://notehub-public.goit.study/api';
+
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
 }
 
-export const BEARER_KEY = import.meta.env.VITE_BEARER_KEY;
+export interface NewNote {
+  title: string;
+  content: string;
+  tag: NoteTag;
+}
 
+export const fetchNotes = async (page: number, search: string) => {
+  const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export const fetchMovie = async (query: string, page: number = 1): Promise<MoviesResponse> => {
-  const urlSearchParams = new URLSearchParams({
-    query,
-    page: page.toString(), 
+  const params: Record<string, string | number> = { page };
+
+  if (search.trim()) {
+    params.search = search.trim();
+  }
+
+  const res = await axios.get<FetchNotesResponse>("/notes", {
+    params,
+    headers: { Authorization: `Bearer ${myKey}` },
   });
-    const {data} = await http.get<MoviesResponse>(`${ROUTES.searchMovie}?${urlSearchParams.toString()}`,{
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${BEARER_KEY}`
-        }
-    });
-    return data;
+
+  return res.data;
+}
+
+export const createNote = async (newNote: NewNote) => {
+  const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+  const res = await axios.post<Note>("/notes", newNote, {
+    headers: { Authorization: `Bearer ${myKey}` },
+  });
+
+  return res.data;
+}
+
+
+export const deleteNote = async (noteId: number) => {
+  const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+  const res = await axios.delete<Note>(`/notes/${noteId}`, {
+    headers: { Authorization: `Bearer ${myKey}` },
+  });
+
+  return res.data;
 }
